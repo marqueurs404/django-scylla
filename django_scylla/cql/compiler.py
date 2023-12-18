@@ -174,3 +174,7 @@ class SQLUpdateCompiler(compiler.SQLUpdateCompiler):
 
 class SQLDeleteCompiler(compiler.SQLDeleteCompiler):
     ...
+
+
+class SQLAggregateCompiler(compiler.SQLAggregateCompiler):
+    ...

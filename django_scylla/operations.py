@@ -57,3 +57,6 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def prepare_sql_script(self, sql):
         return [sql]
+
+    def conditional_expression_supported_in_where_clause(self, expression):
+        return False

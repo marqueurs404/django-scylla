@@ -1,15 +1,30 @@
 import logging
+from enum import Enum
+from typing import Optional
 
 from cassandra.cluster import ResultSet, Session
+from cassandra.util import Date, SortedSet
 
 logger = logging.getLogger(__name__)
+
+
+def list_factory(colnames, rows):
+    for j in range(len(rows)):
+        rows[j] = list(rows[j])
+        for i in range(len(rows[j])):
+            if isinstance(rows[j][i], Date):
+                rows[j][i] = rows[j][i].date()
+            elif isinstance(rows[j][i], SortedSet):
+                rows[j][i] = set(rows[j][i])
+        rows[j] = tuple(rows[j])
+    return rows
 
 
 class Cursor:
     def __init__(self, session: Session):
         logger.debug("CURSOR: Initialize Cursor")
         self.session = session
-        self.result: ResultSet = None
+        self.result: Optional[ResultSet] = None
 
     def __del__(self):
         logger.debug("CURSOR: shutdown session")
@@ -40,6 +55,12 @@ class Cursor:
         if not query:
             return None
         logger.debug("QUERY %s, params %s", query, parameters)
+
+        if parameters:
+            for i in range(len(parameters)):
+                if isinstance(parameters[i], Enum):
+                    parameters[i] = str(parameters[i])
+
         self.result = self.session.execute(query, parameters=parameters)
         return self.result
 

@@ -48,7 +48,7 @@ class Query(sql.query.Query):
                 # SELECT clause which is about to be cleared.
                 q.set_group_by(allow_aliases=False)
             q.clear_select_clause()
-        q.clear_ordering(force=True)
+        q.clear_ordering(force_empty=True)
         if limit:
             q.set_limits(high=1)
         q.add_extra({"a": "count(*)"}, None, None, None, None, None)

@@ -3,13 +3,12 @@ import json
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import EXEC_PROFILE_DEFAULT, ExecutionProfile, ProtocolVersion
 from cassandra.policies import RoundRobinPolicy, TokenAwarePolicy
-from cassandra.query import tuple_factory
 from django.db.backends.base.base import BaseDatabaseWrapper
 
 from . import database as Database
 from .client import DatabaseClient
 from .creation import DatabaseCreation
-from .cursor import Cursor
+from .cursor import Cursor, list_factory
 from .features import DatabaseFeatures
 from .introspection import DatabaseIntrospection
 from .operations import DatabaseOperations
@@ -44,6 +43,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "IPAddressField": "inet",
         "GenericIPAddressField": "inet",
         "JSONField": "text",
+        "ListField": "list<%(value_type)s>",
+        "SetField": "set<%(value_type)s>",
+        "MapField": "map<%(key_type)s,%(value_type)s>",
         "ManyToOneRel": "bigint",
         "OneToOneField": "bigint",
         "PositiveBigIntegerField": "bigint",
@@ -56,16 +58,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "TextField": "text",
         "TimeField": "time",
         "UUIDField": "uuid",
+        "UDTField": "%(name)s"
     }
 
     operators = {
-        "exact": "= %s",
-        "iexact": "= %s",
-        "contains": "CONTAINS %s",
-        "gt": "> %s",
-        "gte": ">= %s",
-        "lt": "< %s",
-        "lte": "<= %s",
+        "ne": '!= %s',
+        "exact": '= %s',
+        "iexact": '= %s',
+        "contains": 'CONTAINS %s',
+        "gt": '> %s',
+        "gte": '>= %s',
+        "lt": '< %s',
+        "lte": '<= %s',
     }
 
     Database = Database
@@ -129,7 +133,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             for k in ep_keys
             if execution_profile_options.get(k)
         }
-        ep_options["row_factory"] = tuple_factory
+        ep_options["row_factory"] = list_factory
         if "load_balancing_policy" not in ep_options:
             ep_options["load_balancing_policy"] = TokenAwarePolicy(RoundRobinPolicy())
 
@@ -145,6 +149,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         cursor = Cursor(cluster.connect())
 
+        # TODO: optimize this, on an single initial setup
         # Ensure that the keyspace exists before using it, if possible.
         if db is not None:
             replication_options = json.dumps(

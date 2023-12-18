@@ -1,27 +1,29 @@
 [tool.poetry]
 name = "django-scylla"
-version = "0.0.10"
+version = "0.0.11"
 description = "Django Scylla"
-authors = ["Rafał Furmański <r.furmanski@gmail.com>"]
+authors = ["Rafał Furmański <r.furmanski@gmail.com>", "Marcus Ong <marcus.ong404@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/r4fek/django-scylla"
-repository = "https://github.com/r4fek/django-scylla"
+homepage = "https://github.com/marqueurs404/django-scylla"
+repository = "https://github.com/marqueurs404/django-scylla"
 documentation = "https://django-scylla.readthedocs.io"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 packages = [{ include = "django_scylla" }]
 
 [tool.poetry.urls]
-Changelog = "https://github.com/r4fek/django-scylla/releases"
+Changelog = "https://github.com/marqueurs404/django-scylla/releases"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-django = ">=3.1 <4.2"
+django = ">=3.1,<6"
 scylla-driver = "^3.25"
 
 [tool.poetry.dev-dependencies]
@@ -43,5 +45,5 @@ pytest-django = "*"
 tox = "*"
 
 [build-system]
-requires = ["poetry>=1.1.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
